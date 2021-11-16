@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Elyjiah Potter, Mike Gebhardt, Triston Hudgins" />
+
+
+<title>Beer Project - EDA</title>
+
+<script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="site_libs/jquery-3.5.1/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.9.4.1/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="site_libs/crosstalk-1.1.1/css/crosstalk.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.1.1/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-1.57.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-1.57.1/plotly-latest.min.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Wicked Awesome Website</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="Beer_Project_EDA.html">Beer Study - Budweiser</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Beer Project - EDA</h1>
+<h4 class="author">Elyjiah Potter, Mike Gebhardt, Triston Hudgins</h4>
+<h4 class="date">10/7/2021</h4>
+
+</div>
+
+
+<div id="question-1-how-many-breweries-are-present-in-each-state" class="section level2">
+<h2>Question 1: How many breweries are present in each state?</h2>
+<p><br></p>
+<div id="pull-data-and-images" class="section level5">
+<h5>Pull Data and Images</h5>
+<pre class="r"><code>#Beer Data
+beers = read.csv(&quot;/Users/19785/OneDrive/Documents/SMU Data Science/DS 6306/Test Website1/Simple Website/Beers.csv&quot;)
+
+#Brewery Data
+breweries = read.csv(&quot;/Users/19785/OneDrive/Documents/SMU Data Science/DS 6306/Test Website1/Simple Website/Breweries.csv&quot;)
+
+# Budweiser Logo=
+img = &quot;/Users/19785/OneDrive/Documents/SMU Data Science/DS 6306/Test Website1/Simple Website/bud_logo copy 2.jpeg&quot;
+img2 = &quot;/Users/19785/OneDrive/Documents/SMU Data Science/DS 6306/Test Website1/Simple Website/bud_logo copy 2.jpeg&quot;</code></pre>
+<p><br></p>
+<p><br></p>
+</div>
+<div id="aggregate-breweries-and-plot-data" class="section level5">
+<h5>Aggregate Breweries and Plot Data</h5>
+<pre class="r"><code># How many breweries?
+
+state_data = breweries %&gt;%
+  group_by(State) %&gt;%
+  summarize(Count = n()) %&gt;%
+  arrange(Count)
+
+#Plot
+
+
+p = state_data %&gt;%
+  ggplot(aes(x = reorder(State,Count), y = Count)) +
+  geom_bar(stat = &quot;identity&quot;,
+           fill = &quot;dodgerblue4&quot;,
+                 alpha = 0.95) +
+  theme(axis.text.x = element_text(angle = 90, 
+                                   vjust = 0.5, 
+                                   hjust = 1,
+                                   size = 8)) +
+  theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
+  ggtitle(&quot;Breweries per State&quot;) +
+  theme(plot.title = element_text(size = 20, face = &quot;bold&quot;)) +
+  theme(axis.text=element_text(size = 10),
+        axis.title=element_text(size=12,face=&quot;bold&quot;)) +
+  xlab(&quot;US States&quot;) +
+  ylab(&quot;Number of Breweries&quot;) +
+  geom_text(aes(label = Count, vjust = -0.75), size = 2.5, color = &quot;black&quot;)
+
+ggbackground(p, img)</code></pre>
+<p><img src="Beer_Project_EDA_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p><br></p>
+<p><br></p>
+</div>
+</div>
+<div id="question-2-merge-beer-data-with-the-breweries-data.-print-the-first-6-observations-and-the-last-six-observations-to-check-the-merged-file." class="section level2">
+<h2>Question 2: Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.</h2>
+<pre class="r"><code>#Create Key
+colnames(beers)[5] = &quot;Brew_ID&quot;
+
+#Join data on key
+beer_data = inner_join(breweries, beers, by = &quot;Brew_ID&quot;)
+
+#Rename column names and make brewery a factor
+colnames(beer_data) = c(&quot;Brew_ID&quot;, &quot;Brewery&quot;, &quot;City&quot;, &quot;State&quot;, &quot;Beer&quot;, &quot;Beer_ID&quot;, &quot;ABV&quot;, &quot;IBU&quot;, &quot;Style&quot;, &quot;Ounces&quot;)
+beer_data$Brewery = factor(beer_data$Brewery)
+
+#Print first and last 6 rows
+head(beer_data, n = 6)</code></pre>
+<pre><code>##   Brew_ID            Brewery        City State          Beer Beer_ID   ABV IBU                               Style Ounces
+## 1       1 NorthGate Brewing  Minneapolis    MN  Get Together    2692 0.045  50                        American IPA     16
+## 2       1 NorthGate Brewing  Minneapolis    MN Maggie&#39;s Leap    2691 0.049  26                  Milk / Sweet Stout     16
+## 3       1 NorthGate Brewing  Minneapolis    MN    Wall&#39;s End    2690 0.048  19                   English Brown Ale     16
+## 4       1 NorthGate Brewing  Minneapolis    MN       Pumpion    2689 0.060  38                         Pumpkin Ale     16
+## 5       1 NorthGate Brewing  Minneapolis    MN    Stronghold    2688 0.060  25                     American Porter     16
+## 6       1 NorthGate Brewing  Minneapolis    MN   Parapet ESB    2687 0.056  47 Extra Special / Strong Bitter (ESB)     16</code></pre>
+<pre class="r"><code>tail(beer_data, n = 6)</code></pre>
+<pre><code>##      Brew_ID                       Brewery          City State                      Beer Beer_ID   ABV IBU                   Style Ounces
+## 2405     556         Ukiah Brewing Company         Ukiah    CA             Pilsner Ukiah      98 0.055  NA         German Pilsener     12
+## 2406     557       Butternuts Beer and Ale Garrattsville    NY  Heinnieweisse Weissebier      52 0.049  NA              Hefeweizen     12
+## 2407     557       Butternuts Beer and Ale Garrattsville    NY           Snapperhead IPA      51 0.068  NA            American IPA     12
+## 2408     557       Butternuts Beer and Ale Garrattsville    NY         Moo Thunder Stout      50 0.049  NA      Milk / Sweet Stout     12
+## 2409     557       Butternuts Beer and Ale Garrattsville    NY         Porkslap Pale Ale      49 0.043  NA American Pale Ale (APA)     12
+## 2410     558 Sleeping Lady Brewing Company     Anchorage    AK Urban Wilderness Pale Ale      30 0.049  NA        English Pale Ale     12</code></pre>
+<p><br></p>
+<p><br></p>
+</div>
+<div id="question-3-address-the-missing-values-in-each-column." class="section level2">
+<h2>Question 3: Address the missing values in each column.</h2>
+<pre class="r"><code>#Find missing items
+gg_miss_var(beer_data) </code></pre>
+<pre><code>## Warning: It is deprecated to specify `guide = FALSE` to remove a guide. Please use `guide = &quot;none&quot;` instead.</code></pre>
+<p><img src="Beer_Project_EDA_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>#A large portion of beers do not have IBU listed, so we will create a separate data set for IBU and ABV comparisons
+full_beer_data = beer_data
+
+beer_data = beer_data %&gt;%
+  filter(!is.na(IBU) &amp; !is.na(ABV))
+
+gg_miss_var(beer_data)</code></pre>
+<pre><code>## Warning: It is deprecated to specify `guide = FALSE` to remove a guide. Please use `guide = &quot;none&quot;` instead.</code></pre>
+<p><img src="Beer_Project_EDA_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
+<p><br></p>
+<p><br></p>
+</div>
+<div id="question-4-compute-the-median-alcohol-content-and-international-bitterness-unit-for-each-state.-plot-a-bar-chart-to-compare." class="section level2">
+<h2>Question 4: Compute the median alcohol content and international bitterness unit for each state. Plot a bar chart to compare.</h2>
+<p><br></p>
+<div id="compute-medians" class="section level5">
+<h5>Compute Medians</h5>
+<pre class="r"><code>med_chart = beer_data %&gt;%
+  group_by(State) %&gt;%
+  summarize(&quot;Median_ABV&quot; = median(ABV), 
+            &quot;Median_IBU&quot; = median(IBU))
+
+med_chart</code></pre>
+<pre><code>## # A tibble: 50 x 3
+##    State Median_ABV Median_IBU
+##    &lt;chr&gt;      &lt;dbl&gt;      &lt;dbl&gt;
+##  1 AK        0.057        46  
+##  2 AL        0.06         43  
+##  3 AR        0.04         39  
+##  4 AZ        0.0575       20.5
+##  5 CA        0.058        42  
+##  6 CO        0.065        40  
+##  7 CT        0.061        29  
+##  8 DC        0.059        47.5
+##  9 DE        0.055        52  
+## 10 FL        0.062        55  
+## # ... with 40 more rows</code></pre>
+<p><br></p>
+<p><br></p>
+</div>
+<div id="plot-data" class="section level5">
+<h5>Plot Data</h5>
+<pre class="r"><code>p_abv = med_chart %&gt;%
+  ggplot(aes(x = reorder(State,Median_ABV), y = Median_ABV)) +
+  geom_bar(stat = &quot;identity&quot;,
+           fill = &quot;dodgerblue4&quot;,
+           color = &quot;dodgerblue4&quot;,
+           alpha = 0.95,
+           width = .75) +
+  theme(axis.text.x = element_text(angle = 90, 
+                                   vjust = 0.5, 
+                                   hjust = 1)) +
+  theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
+  #ggtitle(&quot;Median ABV by State&quot;) +
+  theme(plot.title = element_text(size = 20, face = &quot;bold&quot;)) +
+  theme(axis.text=element_text(size = 10),
+        axis.title=element_text(size=12,face=&quot;bold&quot;)) +
+  xlab(&quot;State&quot;) +
+  ylab(&quot;ABV&quot;)  +
+  coord_cartesian(ylim=c(0.04,0.075)) 
+
+ggbackground(p_abv, img)</code></pre>
+<p><img src="Beer_Project_EDA_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code>p_abv = med_chart %&gt;%
+  ggplot(aes(x = reorder(State,Median_IBU), y = Median_IBU)) +
+  geom_bar(stat = &quot;identity&quot;,
+           fill = &quot;dodgerblue4&quot;,
+           color = &quot;dodgerblue4&quot;,
+           alpha = 0.95,
+           width = .75) +
+  theme(axis.text.x = element_text(angle = 90, 
+                                   vjust = 0.5, 
+                                   hjust = 1)) +
+  theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
+  #ggtitle(&quot;Median IBU by State&quot;) +
+  theme(plot.title = element_text(size = 20, face = &quot;bold&quot;)) +
+  theme(axis.text=element_text(size = 10),
+        axis.title=element_text(size=12,face=&quot;bold&quot;)) +
+  xlab(&quot;State&quot;) +
+  ylab(&quot;IBU&quot;) +
+  coord_cartesian(ylim=c(20,60))
+
+ggbackground(p_abv, img)</code></pre>
+<p><img src="Beer_Project_EDA_files/figure-html/unnamed-chunk-6-2.png" width="672" /></p>
+<p><br></p>
+<p><br></p>
+</div>
+</div>
+<div id="question-5-which-state-has-the-maximum-alcoholic-abv-beer-which-state-has-the-most-bitter-ibu-beer" class="section level2">
+<h2>Question 5: Which state has the maximum alcoholic (ABV) beer? Which state has the most bitter (IBU) beer?</h2>
+<p><br></p>
+<div id="address-question" class="section level5">
+<h5>Address Question</h5>
+<pre class="r"><code>max_chart = beer_data %&gt;%
+  group_by(State) %&gt;%
+  summarize(&quot;Max_ABV&quot; = max(ABV), 
+            &quot;Max_IBU&quot; = max(IBU))
+
+#Max ABV
+max_chart[which.max(max_chart$Max_ABV),]</code></pre>
+<pre><code>## # A tibble: 1 x 3
+##   State Max_ABV Max_IBU
+##   &lt;chr&gt;   &lt;dbl&gt;   &lt;int&gt;
+## 1 KY      0.125      80</code></pre>
+<pre class="r"><code>#Max IBU
+max_chart[which.max(max_chart$Max_IBU),]</code></pre>
+<pre><code>## # A tibble: 1 x 3
+##   State Max_ABV Max_IBU
+##   &lt;chr&gt;   &lt;dbl&gt;   &lt;int&gt;
+## 1 OR      0.085     138</code></pre>
+<p><br></p>
+</div>
+<div id="plot-data-1" class="section level5">
+<h5>Plot Data</h5>
+<pre class="r"><code>p = max_chart %&gt;%
+  ggplot(aes(x = Max_IBU, y = Max_ABV, color = State)) +
+  geom_point() +
+  coord_cartesian(ylim=c(0.04,.13)) +
+  ggtitle(&quot;Max IBU and ABV by State&quot;) +
+  xlab(&quot;Max ABV&quot;) +
+  ylab(&quot;Max IBU&quot;)
+
+ggplotly(p)</code></pre>
+<div id="htmlwidget-3f6123dbb3aa4891a12d" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-3f6123dbb3aa4891a12d">{"x":{"data":[{"x":[71],"y":[0.065],"text":"Max_IBU:  71<br />Max_ABV: 0.065<br />State: AK","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)"}},"hoveron":"points","name":"AK","legendgroup":"AK","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[103],"y":[0.093],"text":"Max_IBU: 103<br />Max_ABV: 0.093<br />State: AL","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(243,123,89,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(243,123,89,1)"}},"hoveron":"points","name":"AL","legendgroup":"AL","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[39],"y":[0.04],"text":"Max_IBU:  39<br />Max_ABV: 0.040<br />State: AR","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(237,129,65,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(237,129,65,1)"}},"hoveron":"points","name":"AR","legendgroup":"AR","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[99],"y":[0.095],"text":"Max_IBU:  99<br />Max_ABV: 0.095<br />State: AZ","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(231,134,27,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(231,134,27,1)"}},"hoveron":"points","name":"AZ","legendgroup":"AZ","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[115],"y":[0.099],"text":"Max_IBU: 115<br />Max_ABV: 0.099<br />State: CA","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(224,139,0,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(224,139,0,1)"}},"hoveron":"points","name":"CA","legendgroup":"CA","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[104],"y":[0.099],"text":"Max_IBU: 104<br />Max_ABV: 0.099<br />State: CO","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(216,144,0,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(216,144,0,1)"}},"hoveron":"points","name":"CO","legendgroup":"CO","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[85],"y":[0.088],"text":"Max_IBU:  85<br />Max_ABV: 0.088<br />State: CT","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(207,148,0,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(207,148,0,1)"}},"hoveron":"points","name":"CT","legendgroup":"CT","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[115],"y":[0.092],"text":"Max_IBU: 115<br />Max_ABV: 0.092<br />State: DC","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(197,153,0,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(197,153,0,1)"}},"hoveron":"points","name":"DC","legendgroup":"DC","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[52],"y":[0.055],"text":"Max_IBU:  52<br />Max_ABV: 0.055<br />State: DE","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(187,157,0,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(187,157,0,1)"}},"hoveron":"points","name":"DE","legendgroup":"DE","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[82],"y":[0.082],"text":"Max_IBU:  82<br />Max_ABV: 0.082<br />State: FL","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(175,161,0,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(175,161,0,1)"}},"hoveron":"points","name":"FL","legendgroup":"FL","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[65],"y":[0.072],"text":"Max_IBU:  65<br />Max_ABV: 0.072<br />State: GA","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(163,165,0,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(163,165,0,1)"}},"hoveron":"points","name":"GA","legendgroup":"GA","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[75],"y":[0.072],"text":"Max_IBU:  75<br />Max_ABV: 0.072<br />State: HI","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(149,169,0,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(149,169,0,1)"}},"hoveron":"points","name":"HI","legendgroup":"HI","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[99],"y":[0.095],"text":"Max_IBU:  99<br />Max_ABV: 0.095<br />State: IA","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(133,173,0,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(133,173,0,1)"}},"hoveron":"points","name":"IA","legendgroup":"IA","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[100],"y":[0.099],"text":"Max_IBU: 100<br />Max_ABV: 0.099<br />State: ID","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(114,176,0,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(114,176,0,1)"}},"hoveron":"points","name":"ID","legendgroup":"ID","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[100],"y":[0.096],"text":"Max_IBU: 100<br />Max_ABV: 0.096<br />State: IL","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(91,179,0,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(91,179,0,1)"}},"hoveron":"points","name":"IL","legendgroup":"IL","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[115],"y":[0.12],"text":"Max_IBU: 115<br />Max_ABV: 0.120<br />State: IN","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(57,182,0,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(57,182,0,1)"}},"hoveron":"points","name":"IN","legendgroup":"IN","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[110],"y":[0.085],"text":"Max_IBU: 110<br />Max_ABV: 0.085<br />State: KS","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,184,31,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,184,31,1)"}},"hoveron":"points","name":"KS","legendgroup":"KS","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[80],"y":[0.125],"text":"Max_IBU:  80<br />Max_ABV: 0.125<br />State: KY","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,186,66,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,186,66,1)"}},"hoveron":"points","name":"KY","legendgroup":"KY","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[60],"y":[0.07],"text":"Max_IBU:  60<br />Max_ABV: 0.070<br />State: LA","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,188,89,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,188,89,1)"}},"hoveron":"points","name":"LA","legendgroup":"LA","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[130],"y":[0.099],"text":"Max_IBU: 130<br />Max_ABV: 0.099<br />State: MA","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,190,108,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,190,108,1)"}},"hoveron":"points","name":"MA","legendgroup":"MA","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[90],"y":[0.085],"text":"Max_IBU:  90<br />Max_ABV: 0.085<br />State: MD","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,191,125,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,191,125,1)"}},"hoveron":"points","name":"MD","legendgroup":"MD","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[70],"y":[0.07],"text":"Max_IBU:  70<br />Max_ABV: 0.070<br />State: ME","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,192,141,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,192,141,1)"}},"hoveron":"points","name":"ME","legendgroup":"ME","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[115],"y":[0.085],"text":"Max_IBU: 115<br />Max_ABV: 0.085<br />State: MI","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,193,156,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,193,156,1)"}},"hoveron":"points","name":"MI","legendgroup":"MI","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[120],"y":[0.099],"text":"Max_IBU: 120<br />Max_ABV: 0.099<br />State: MN","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,193,170,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,193,170,1)"}},"hoveron":"points","name":"MN","legendgroup":"MN","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[89],"y":[0.075],"text":"Max_IBU:  89<br />Max_ABV: 0.075<br />State: MO","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,192,184,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,192,184,1)"}},"hoveron":"points","name":"MO","legendgroup":"MO","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[80],"y":[0.08],"text":"Max_IBU:  80<br />Max_ABV: 0.080<br />State: MS","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)"}},"hoveron":"points","name":"MS","legendgroup":"MS","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[80],"y":[0.072],"text":"Max_IBU:  80<br />Max_ABV: 0.072<br />State: MT","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,189,208,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,189,208,1)"}},"hoveron":"points","name":"MT","legendgroup":"MT","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[98],"y":[0.099],"text":"Max_IBU:  98<br />Max_ABV: 0.099<br />State: NC","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,187,219,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,187,219,1)"}},"hoveron":"points","name":"NC","legendgroup":"NC","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[70],"y":[0.067],"text":"Max_IBU:  70<br />Max_ABV: 0.067<br />State: ND","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,184,229,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,184,229,1)"}},"hoveron":"points","name":"ND","legendgroup":"ND","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[65],"y":[0.065],"text":"Max_IBU:  65<br />Max_ABV: 0.065<br />State: NE","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,180,239,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,180,239,1)"}},"hoveron":"points","name":"NE","legendgroup":"NE","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[82],"y":[0.065],"text":"Max_IBU:  82<br />Max_ABV: 0.065<br />State: NH","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,176,246,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,176,246,1)"}},"hoveron":"points","name":"NH","legendgroup":"NH","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[100],"y":[0.099],"text":"Max_IBU: 100<br />Max_ABV: 0.099<br />State: NJ","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,171,253,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,171,253,1)"}},"hoveron":"points","name":"NJ","legendgroup":"NJ","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[100],"y":[0.072],"text":"Max_IBU: 100<br />Max_ABV: 0.072<br />State: NM","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,165,255,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,165,255,1)"}},"hoveron":"points","name":"NM","legendgroup":"NM","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[90],"y":[0.093],"text":"Max_IBU:  90<br />Max_ABV: 0.093<br />State: NV","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(82,158,255,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(82,158,255,1)"}},"hoveron":"points","name":"NV","legendgroup":"NV","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[111],"y":[0.1],"text":"Max_IBU: 111<br />Max_ABV: 0.100<br />State: NY","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(121,151,255,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(121,151,255,1)"}},"hoveron":"points","name":"NY","legendgroup":"NY","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[126],"y":[0.089],"text":"Max_IBU: 126<br />Max_ABV: 0.089<br />State: OH","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(149,144,255,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(149,144,255,1)"}},"hoveron":"points","name":"OH","legendgroup":"OH","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[100],"y":[0.076],"text":"Max_IBU: 100<br />Max_ABV: 0.076<br />State: OK","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(172,136,255,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(172,136,255,1)"}},"hoveron":"points","name":"OK","legendgroup":"OK","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[138],"y":[0.085],"text":"Max_IBU: 138<br />Max_ABV: 0.085<br />State: OR","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(191,128,255,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(191,128,255,1)"}},"hoveron":"points","name":"OR","legendgroup":"OR","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[113],"y":[0.092],"text":"Max_IBU: 113<br />Max_ABV: 0.092<br />State: PA","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(207,120,255,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(207,120,255,1)"}},"hoveron":"points","name":"PA","legendgroup":"PA","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[75],"y":[0.086],"text":"Max_IBU:  75<br />Max_ABV: 0.086<br />State: RI","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(220,113,250,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(220,113,250,1)"}},"hoveron":"points","name":"RI","legendgroup":"RI","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[65],"y":[0.068],"text":"Max_IBU:  65<br />Max_ABV: 0.068<br />State: SC","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(231,107,243,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(231,107,243,1)"}},"hoveron":"points","name":"SC","legendgroup":"SC","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[61],"y":[0.062],"text":"Max_IBU:  61<br />Max_ABV: 0.062<br />State: TN","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(240,102,234,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(240,102,234,1)"}},"hoveron":"points","name":"TN","legendgroup":"TN","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[118],"y":[0.099],"text":"Max_IBU: 118<br />Max_ABV: 0.099<br />State: TX","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(247,99,224,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(247,99,224,1)"}},"hoveron":"points","name":"TX","legendgroup":"TX","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[83],"y":[0.09],"text":"Max_IBU:  83<br />Max_ABV: 0.090<br />State: UT","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(252,97,213,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(252,97,213,1)"}},"hoveron":"points","name":"UT","legendgroup":"UT","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[135],"y":[0.088],"text":"Max_IBU: 135<br />Max_ABV: 0.088<br />State: VA","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,97,201,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(255,97,201,1)"}},"hoveron":"points","name":"VA","legendgroup":"VA","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[120],"y":[0.082],"text":"Max_IBU: 120<br />Max_ABV: 0.082<br />State: VT","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,98,188,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(255,98,188,1)"}},"hoveron":"points","name":"VT","legendgroup":"VT","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[83],"y":[0.084],"text":"Max_IBU:  83<br />Max_ABV: 0.084<br />State: WA","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,101,174,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(255,101,174,1)"}},"hoveron":"points","name":"WA","legendgroup":"WA","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[80],"y":[0.087],"text":"Max_IBU:  80<br />Max_ABV: 0.087<br />State: WI","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,104,159,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(255,104,159,1)"}},"hoveron":"points","name":"WI","legendgroup":"WI","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[71],"y":[0.067],"text":"Max_IBU:  71<br />Max_ABV: 0.067<br />State: WV","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,108,145,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(255,108,145,1)"}},"hoveron":"points","name":"WV","legendgroup":"WV","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[75],"y":[0.07],"text":"Max_IBU:  75<br />Max_ABV: 0.070<br />State: WY","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,108,145,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(255,108,145,1)"}},"hoveron":"points","name":"WY","legendgroup":"WY","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":43.7625570776256,"r":7.30593607305936,"b":40.1826484018265,"l":48.9497716894977},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"title":{"text":"Max IBU and ABV by State","font":{"color":"rgba(0,0,0,1)","family":"","size":17.5342465753425},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[34.05,142.95],"tickmode":"array","ticktext":["60","90","120"],"tickvals":[60,90,120],"categoryorder":"array","categoryarray":["60","90","120"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"Max ABV","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.0355,0.1345],"tickmode":"array","ticktext":["0.04","0.06","0.08","0.10","0.12"],"tickvals":[0.04,0.06,0.08,0.1,0.12],"categoryorder":"array","categoryarray":["0.04","0.06","0.08","0.10","0.12"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"Max IBU","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895},"y":0.96751968503937},"annotations":[{"text":"State","x":1.02,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"left","yanchor":"bottom","legendTitle":true}],"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"74705c2a77ba":{"x":{},"y":{},"colour":{},"type":"scatter"}},"cur_data":"74705c2a77ba","visdat":{"74705c2a77ba":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p><br></p>
+</div>
+</div>
+<div id="question-6-comment-on-the-summary-statistics-and-distribution-of-the-abv-variable." class="section level2">
+<h2>Question 6: Comment on the summary statistics and distribution of the ABV variable.</h2>
+<p><br></p>
+<div id="summarize-data" class="section level5">
+<h5>Summarize Data</h5>
+<pre class="r"><code>summary(beer_data$ABV)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## 0.02700 0.05000 0.05700 0.05991 0.06800 0.12500</code></pre>
+<p><br></p>
+</div>
+<div id="plot-data-2" class="section level5">
+<h5>Plot Data</h5>
+<pre class="r"><code>p_abv = beer_data %&gt;%
+  ggplot(aes(x = ABV)) +
+  geom_histogram(stat = &quot;count&quot;,
+                 fill = &quot;dodgerblue4&quot;,
+           color = &quot;dodgerblue4&quot;,
+           alpha = 0.95) +
+  theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
+  ggtitle(&quot;ABV Distribution&quot;) +
+  theme(plot.title = element_text(size = 20, face = &quot;bold&quot;)) +
+  theme(axis.text=element_text(size = 10),
+        axis.title=element_text(size=12,face=&quot;bold&quot;)) +
+  xlab(&quot;ABV&quot;) +
+  ylab(&quot;Count&quot;)</code></pre>
+<pre><code>## Warning: Ignoring unknown parameters: binwidth, bins, pad</code></pre>
+<pre class="r"><code>ggbackground(p_abv, img)</code></pre>
+<p><img src="Beer_Project_EDA_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<pre class="r"><code>p_abv = beer_data %&gt;%
+  ggplot(aes(x = ABV)) +
+  geom_boxplot(fill = &quot;dodgerblue4&quot;,
+           color = &quot;dodgerblue4&quot;,
+           alpha = 0.95) +
+  theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
+  ggtitle(&quot;ABV Distribution&quot;) +
+  theme(plot.title = element_text(size = 20, face = &quot;bold&quot;)) +
+  theme(axis.text=element_text(size = 10),
+        axis.title=element_text(size=12,face=&quot;bold&quot;)) +
+  xlab(&quot;ABV&quot;) +
+  ylab(&quot;Count&quot;)
+
+ggbackground(p_abv, img)</code></pre>
+<p><img src="Beer_Project_EDA_files/figure-html/unnamed-chunk-10-2.png" width="672" /></p>
+<p><br></p>
+</div>
+<div id="findings" class="section level3">
+<h3>Findings</h3>
+<ul>
+<li><p>The distribution of ABV is right skewed with a mean of 0.05991 and a median of 0.057.</p></li>
+<li><p>50% of the data is nested between the values .05 and .068</p></li>
+</ul>
+<p><br></p>
+<p><br></p>
+</div>
+</div>
+<div id="question-7-is-there-an-apparent-relationship-between-the-bitterness-of-the-beer-and-its-alcoholic-content-draw-a-scatter-plot.-make-your-best-judgment-of-a-relationship-and-explain-your-answer." class="section level2">
+<h2>Question 7: Is there an apparent relationship between the bitterness of the beer and its alcoholic content? Draw a scatter plot. Make your best judgment of a relationship and EXPLAIN your answer.</h2>
+<p><br></p>
+<div id="plot-data-3" class="section level5">
+<h5>Plot Data</h5>
+<pre class="r"><code>p = beer_data %&gt;%
+  ggplot(aes(x = IBU, y = ABV)) +
+  geom_point(position = &quot;jitter&quot;,
+           color = &quot;dodgerblue4&quot;,
+           color = &quot;dodgerblue4&quot;,
+           alpha = 0.95) +
+  geom_smooth(method = lm, color = &quot;darkgoldenrod1&quot;) +
+  theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
+  ggtitle(&quot;IBU vs ABV&quot;) +
+  theme(plot.title = element_text(size = 20, face = &quot;bold&quot;)) +
+  theme(axis.text=element_text(size = 10),
+        axis.title=element_text(size=12,face=&quot;bold&quot;)) +
+  xlab(&quot;IBU&quot;) +
+  ylab(&quot;ABV&quot;)</code></pre>
+<pre><code>## Warning: Duplicated aesthetics after name standardisation: colour</code></pre>
+<pre class="r"><code>ggbackground(p, img)</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="Beer_Project_EDA_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><br></p>
+</div>
+<div id="findings-1" class="section level3">
+<h3>Findings</h3>
+<ul>
+<li><p>There appears to be a positive correlation between bitterness (IBU) and alcohol content (ABV).</p></li>
+<li><p>In general, as IBU increases, we also see an increase in ABV. This can be seen with higher clarity with the included linear model regression line</p></li>
+</ul>
+<p><br></p>
+<p><br></p>
+</div>
+</div>
+<div id="question-8-budweiser-would-also-like-to-investigate-the-difference-with-respect-to-ibu-and-abv-between-ipas-india-pale-ales-and-other-types-of-ale-any-beer-with-ale-in-its-name-other-than-ipa---use-knn-to-inestigate-and-provide-statistical-evidence." class="section level2">
+<h2>Question 8: Budweiser would also like to investigate the difference with respect to IBU and ABV between IPAs (India Pale Ales) and other types of Ale (any beer with “Ale” in its name other than IPA) - Use KNN to inestigate and provide statistical evidence.</h2>
+<p><br></p>
+<div id="filter-data" class="section level5">
+<h5>Filter Data</h5>
+<pre class="r"><code>ales = beer_data %&gt;%
+  mutate(Ale = case_when(
+    grepl(&quot;IPA&quot;,Style)|grepl(&quot;India Pale&quot;,Style) ~ &quot;IPA&quot;,
+    !grepl(&quot;IPA&quot;,Style)&amp;grepl(&quot;Ale&quot;,Style) ~ &quot;Ale&quot;)) %&gt;% 
+  filter(!is.na(Ale))</code></pre>
+<p><br></p>
+</div>
+<div id="plot-data-and-create-initial-model" class="section level5">
+<h5>Plot Data and Create Initial Model</h5>
+<pre class="r"><code>splitPerc = 0.75
+
+trainInices = sample(1:dim(ales)[1], round(splitPerc * dim(ales)[1]))
+
+train = ales[trainInices,]
+test = ales[-trainInices,]
+
+p_ale = ales %&gt;%
+  ggplot(aes(x = IBU, y = ABV, color = Ale)) +
+  geom_point(position = &quot;jitter&quot;) +
+  ggtitle(&quot;Ales - IBU vs ABV&quot;) +
+  theme(plot.title = element_text(size = 20, face = &quot;bold&quot;)) +
+  theme(axis.text=element_text(size = 10),
+        axis.title=element_text(size=12,face=&quot;bold&quot;)) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+
+ggbackground(p_ale, img2)</code></pre>
+<p><img src="Beer_Project_EDA_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<pre class="r"><code># K = 3
+classifications = knn(train[,c(7,8)], test[,c(7,8)], train$Ale, prob = TRUE, k = 3)
+table(classifications, test$Ale)</code></pre>
+<pre><code>##                
+## classifications Ale IPA
+##             Ale 133  15
+##             IPA  21  68</code></pre>
+<pre class="r"><code>confusionMatrix(table(classifications,test$Ale))</code></pre>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##                
+## classifications Ale IPA
+##             Ale 133  15
+##             IPA  21  68
+##                                          
+##                Accuracy : 0.8481         
+##                  95% CI : (0.796, 0.8913)
+##     No Information Rate : 0.6498         
+##     P-Value [Acc &gt; NIR] : 6.883e-12      
+##                                          
+##                   Kappa : 0.6717         
+##                                          
+##  Mcnemar&#39;s Test P-Value : 0.4047         
+##                                          
+##             Sensitivity : 0.8636         
+##             Specificity : 0.8193         
+##          Pos Pred Value : 0.8986         
+##          Neg Pred Value : 0.7640         
+##              Prevalence : 0.6498         
+##          Detection Rate : 0.5612         
+##    Detection Prevalence : 0.6245         
+##       Balanced Accuracy : 0.8415         
+##                                          
+##        &#39;Positive&#39; Class : Ale            
+## </code></pre>
+<p><br></p>
+<p><br></p>
+</div>
+<div id="normalize-data-to-account-for-scale-issue" class="section level5">
+<h5>Normalize Data to Account for Scale Issue</h5>
+<pre class="r"><code>ale_scaled = data.frame(ZABV = scale(ales$ABV), ZIBU = scale(ales$IBU), Ale = ales$Ale)</code></pre>
+<p><br></p>
+<p><br></p>
+</div>
+<div id="find-ideal-k-value" class="section level5">
+<h5>Find Ideal K Value</h5>
+<pre class="r"><code>iterations = 1000 
+numks = 100
+
+masterAcc = matrix(nrow = iterations, ncol = numks)
+  
+for(j in 1:iterations)
+{
+accs = data.frame(accuracy = numeric(numks), k = numeric(numks))
+trainIndices = sample(1:dim(ale_scaled)[1],round(splitPerc * dim(ale_scaled)[1]))
+train = ale_scaled[trainIndices,]
+test = ale_scaled[-trainIndices,]
+for(i in 1:numks)
+{
+  classifications = knn(train[,c(1,2)],test[,c(1,2)],train$Ale, prob = TRUE, k = i)
+  table(classifications,test$Ale)
+  CM = confusionMatrix(table(classifications,test$Ale))
+  masterAcc[j,i] = CM$overall[1]
+}
+}
+MeanAcc = colMeans(masterAcc)
+plot(seq(1,numks,1),MeanAcc, type = &quot;l&quot;)</code></pre>
+<p><img src="Beer_Project_EDA_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p><br></p>
+</div>
+<div id="findings-2" class="section level5">
+<h5>Findings</h5>
+<ul>
+<li>Ideal K value is 20</li>
+</ul>
+<p><br></p>
+<p><br></p>
+</div>
+<div id="test-new-model-on-normalized-dataset-with-ideal-k-value" class="section level5">
+<h5>Test New Model on Normalized Dataset with ideal K value</h5>
+<pre class="r"><code>ale_scaled = data.frame(ZABV = scale(ales$ABV), ZIBU = scale(ales$IBU), Ale = ales$Ale)
+
+
+splitPerc = 0.70
+
+trainInices = sample(1:dim(ale_scaled)[1], round(splitPerc * dim(ale_scaled)[1]))
+
+train = ale_scaled[trainInices,]
+test = ale_scaled[-trainInices,]
+
+# K = 20
+classifications = knn(train[,c(1,2)], test[,c(1,2)], train$Ale, prob = TRUE, k = 20)
+table(classifications, test$Ale)</code></pre>
+<pre><code>##                
+## classifications Ale IPA
+##             Ale 156  21
+##             IPA  15  92</code></pre>
+<pre class="r"><code>confusionMatrix(table(classifications,test$Ale))</code></pre>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##                
+## classifications Ale IPA
+##             Ale 156  21
+##             IPA  15  92
+##                                           
+##                Accuracy : 0.8732          
+##                  95% CI : (0.8289, 0.9096)
+##     No Information Rate : 0.6021          
+##     P-Value [Acc &gt; NIR] : &lt;2e-16          
+##                                           
+##                   Kappa : 0.733           
+##                                           
+##  Mcnemar&#39;s Test P-Value : 0.4047          
+##                                           
+##             Sensitivity : 0.9123          
+##             Specificity : 0.8142          
+##          Pos Pred Value : 0.8814          
+##          Neg Pred Value : 0.8598          
+##              Prevalence : 0.6021          
+##          Detection Rate : 0.5493          
+##    Detection Prevalence : 0.6232          
+##       Balanced Accuracy : 0.8632          
+##                                           
+##        &#39;Positive&#39; Class : Ale             
+## </code></pre>
+<p><br></p>
+<p><br></p>
+</div>
+<div id="create-random-dataset-to-test-for-analysis-trends-of-ipa-and-ale" class="section level5">
+<h5>Create Random Dataset to Test for Analysis Trends of IPA and Ale</h5>
+<pre class="r"><code>#Random Data Set
+set.seed(13)
+
+ABV_min = 0.027 * 1000
+ABV_max = 0.125 * 1000
+IBU_min = 4
+IBU_max = 138
+
+ABV = c(sample(ABV_min : ABV_max, 10000, rep=TRUE))
+ABV = ABV/1000
+  
+IBU = c(sample(IBU_min : IBU_max, 10000, rep=TRUE))
+IBU = IBU
+
+random_beer = data.frame(cbind(ABV, IBU))
+random_beer$ABV = scale(random_beer$ABV)
+random_beer$IBU = scale(random_beer$IBU)</code></pre>
+<p><br></p>
+<p><br></p>
+</div>
+<div id="run-random-dataset-through-model-and-illustrate-predictions" class="section level5">
+<h5>Run Random Dataset through Model and Illustrate Predictions</h5>
+<pre class="r"><code>classifications = knn(ale_scaled[,c(1,2)], random_beer[,c(1,2)], ale_scaled$Ale, k = 20)
+
+
+ABV_class = data.frame(table(random_beer$ABV,classifications))
+colnames(ABV_class) = c(&quot;ABV&quot;, &quot;Classification&quot;, &quot;Freq&quot;)
+IBU_class = data.frame(table(random_beer$IBU,classifications))
+colnames(IBU_class) = c(&quot;IBU&quot;, &quot;Classification&quot;, &quot;Freq&quot;)
+
+#Illustrate distribution of predictions
+
+ABV_class$ABV = as.numeric(as.matrix(ABV_class)[,1]) 
+
+p_abv = ABV_class %&gt;%
+  ggplot(aes(x = ABV, y = Freq, fill = Classification)) +
+  stat_smooth(geom = &quot;area&quot;, method = &quot;loess&quot;, span = .7, alpha = .5) +
+  ggtitle(&quot;ABV Classification Distribution&quot;) +
+  xlim(-1.2,1.2) +
+  theme(plot.title = element_text(size = 20, face = &quot;bold&quot;)) +
+  theme(axis.text=element_text(size = 10),
+        axis.title=element_text(size=12,face=&quot;bold&quot;)) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+ggbackground(p_abv, img2)</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<pre><code>## Warning: Removed 62 rows containing non-finite values (stat_smooth).</code></pre>
+<p><img src="Beer_Project_EDA_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<pre class="r"><code>IBU_class$IBU = as.numeric(as.matrix(IBU_class)[,1]) 
+
+p_ibu = IBU_class %&gt;%
+  ggplot(aes(x = IBU, y = Freq, fill = Classification)) +
+  stat_smooth(geom = &quot;area&quot;, method = &quot;loess&quot;, span = .7, alpha = .5) +
+  ylim(0,80) +
+  xlim(-1,1) +
+  ggtitle(&quot;IBU Classification Distribution&quot;) +
+  theme(plot.title = element_text(size = 20, face = &quot;bold&quot;)) +
+  theme(axis.text=element_text(size = 10),
+        axis.title=element_text(size=12,face=&quot;bold&quot;)) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+ggbackground(p_ibu, img2)</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<pre><code>## Warning: Removed 120 rows containing non-finite values (stat_smooth).</code></pre>
+<p><img src="Beer_Project_EDA_files/figure-html/unnamed-chunk-18-2.png" width="672" /></p>
+<p><br></p>
+<p><br></p>
+</div>
+<div id="run-a-t-test-on-original-data-address-assumptions" class="section level5">
+<h5>Run a t-Test on original Data: Address Assumptions</h5>
+<pre class="r"><code>#Normality
+
+p = ales %&gt;%
+  ggplot(aes(x = IBU, fill = Ale)) +
+  geom_histogram(bins = 20) +
+  facet_wrap(~Ale) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  ggtitle(&quot;Testing for IBU Normality&quot;)
+ggbackground(p, img)</code></pre>
+<p><img src="Beer_Project_EDA_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<pre class="r"><code>p = ales %&gt;%
+  ggplot(aes(x = ABV, fill = Ale)) +
+  geom_histogram(bins = 20) +
+  facet_wrap(~Ale) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  ggtitle(&quot;Testing for ABV Normality&quot;)
+ggbackground(p, img)</code></pre>
+<p><img src="Beer_Project_EDA_files/figure-html/unnamed-chunk-19-2.png" width="672" /></p>
+<pre class="r"><code># Equal Variance
+
+p = ales %&gt;%
+  ggplot(aes(x = IBU, fill = Ale)) +
+  geom_boxplot() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  ggtitle(&quot;Testing for IBU Variance&quot;)
+ggbackground(p, img)</code></pre>
+<p><img src="Beer_Project_EDA_files/figure-html/unnamed-chunk-19-3.png" width="672" /></p>
+<pre class="r"><code>p = ales %&gt;%
+  ggplot(aes(x = ABV, fill = Ale)) +
+  geom_boxplot() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  ggtitle(&quot;Testing for ABV Variance&quot;)
+ggbackground(p, img)</code></pre>
+<p><img src="Beer_Project_EDA_files/figure-html/unnamed-chunk-19-4.png" width="672" /></p>
+<p><br></p>
+</div>
+<div id="findings-3" class="section level5">
+<h5>Findings</h5>
+<ul>
+<li><p>Distributions are both right skewed, but fairly normal</p></li>
+<li><p>Variance is not identical, but not drastically different</p></li>
+<li><p>Independence may be assumed</p></li>
+<li><p>We will continue with a Welch’s t-Test</p></li>
+</ul>
+<p><br></p>
+<p><br></p>
+</div>
+<div id="t-test" class="section level5">
+<h5>t-Test</h5>
+<pre class="r"><code>t.test( x = ales %&gt;% 
+          filter(Ale == &quot;IPA&quot;) %&gt;%
+          select(ABV),
+        y = ales %&gt;% 
+          filter(Ale == &quot;Ale&quot;) %&gt;%
+          select(ABV),
+        alternative = &quot;two.sided&quot;,
+        var.equal = FALSE,
+        conf.level = 0.95)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  ales %&gt;% filter(Ale == &quot;IPA&quot;) %&gt;% select(ABV) and ales %&gt;% filter(Ale == &quot;Ale&quot;) %&gt;% select(ABV)
+## t = 16.207, df = 801.73, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  0.01101906 0.01405596
+## sample estimates:
+##  mean of x  mean of y 
+## 0.06909367 0.05655616</code></pre>
+<pre class="r"><code>t.test( x = ales %&gt;% 
+          filter(Ale == &quot;IPA&quot;) %&gt;%
+          select(IBU),
+        y = ales %&gt;% 
+          filter(Ale == &quot;Ale&quot;) %&gt;%
+          select(IBU),
+        alternative = &quot;two.sided&quot;,
+        var.equal = FALSE,
+        conf.level = 0.95)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  ales %&gt;% filter(Ale == &quot;IPA&quot;) %&gt;% select(IBU) and ales %&gt;% filter(Ale == &quot;Ale&quot;) %&gt;% select(IBU)
+## t = 30.156, df = 805.05, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  35.10601 39.99441
+## sample estimates:
+## mean of x mean of y 
+##  71.88354  34.33333</code></pre>
+<p><br></p>
+</div>
+<div id="abv-conclusion" class="section level5">
+<h5>ABV Conclusion</h5>
+<ul>
+<li>We have sufficient evidence to assert that the average alcohol content of an IPA is greater than another type of ale (p-value &lt; 0.0001, Welch’s two sided t-test). The 95% confidence interval for the difference in averages is (0.011, 0.014)</li>
+</ul>
+</div>
+<div id="ibu-conclusion" class="section level5">
+<h5>IBU Conclusion</h5>
+<ul>
+<li>We have sufficient evidence to assert that the average bitterness of an IPA is greater than another type of ale (p-value &lt; 0.0001, Welch’s two sided t-test). The 95% confidence interval for the difference in IBU averages is roughly (35, 40)</li>
+</ul>
+</div>
+</div>
+<div id="question-9-find-one-other-useful-inference-from-the-data-that-you-feel-budweiser-may-be-able-to-find-value-in.-you-must-convince-them-why-it-is-important-and-back-up-your-conviction-with-appropriate-statistical-evidence." class="section level2">
+<h2>Question 9: Find one other useful inference from the data that you feel Budweiser may be able to find value in. You must convince them why it is important and back up your conviction with appropriate statistical evidence.</h2>
+<div id="ipas-are-currently-one-of-the-most-popular-styles-of-beer-and-budweiser-does-not-include-ipas-in-their-collection.-based-on-budweiser-brewery-locations-and-prevelance-of-other-ipa-breweries-in-the-area-does-it-make-sense-for-budweiser-to-begin-making-ipas-in-certain-locations-or-is-the-market-too-saturated-if-so-where" class="section level4">
+<h4>IPAs are currently one of the most popular styles of beer, and Budweiser does not include IPAs in their collection. Based on Budweiser Brewery locations and prevelance of other IPA breweries in the area, does it make sense for Budweiser to begin making IPAs in certain locations, or is the market too saturated? If so, where?</h4>
+<p><br></p>
+<p><br></p>
+<div id="create-ipa-dataset" class="section level5">
+<h5>Create IPA Dataset</h5>
+<pre class="r"><code>IPA = full_beer_data %&gt;%
+  mutate(IPA_Count = case_when(
+    grepl(&quot;IPA&quot;,Style)|grepl(&quot;India Pale&quot;,Style) ~ 1,
+    !grepl(&quot;IPA&quot;,Style)&amp;!grepl(&quot;India Pale&quot;,Style) ~ 0))</code></pre>
+<p><br></p>
+<p><br></p>
+</div>
+<div id="merge-with-state-data-for-plotting" class="section level5">
+<h5>Merge with State Data for Plotting</h5>
+<pre class="r"><code>state_data = statepop %&gt;%
+  select(fips, abbr, full) %&gt;%
+  arrange(abbr)
+
+statebrew = IPA %&gt;%
+  select(State, Brewery, IPA_Count) %&gt;%
+  group_by(State) %&gt;%
+  summarize(Breweries = sum(IPA_Count)) %&gt;%
+  arrange(State)
+
+beermap = cbind(statebrew, state_data) %&gt;%
+  select(fips, State, Breweries, full)</code></pre>
+<p><br></p>
+<p><br></p>
+</div>
+<div id="budweiser-brewery-locations" class="section level5">
+<h5>Budweiser Brewery Locations</h5>
+<pre class="r"><code>Cbus = tibble(
+  long = c(-82.9988),
+  lat = c(39.9612),
+  names = c(&quot;Columbus&quot;))
+Cbus = usmap_transform(Cbus)</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj = prefer_proj): Discarded datum unknown in Proj4 definition</code></pre>
+<pre class="r"><code>Bville = tibble(
+  long = c(-76.3327),
+  lat = c(43.1587),
+  names = c(&quot;Baldwinsville&quot;))
+Bville = usmap_transform(Bville)</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj = prefer_proj): Discarded datum unknown in Proj4 definition</code></pre>
+<pre class="r"><code>Cville = tibble(
+  long = c(-84.7999),
+  lat = c(34.1651),
+  names = c(&quot;Cartersville&quot;))
+Cville = usmap_transform(Cville)</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj = prefer_proj): Discarded datum unknown in Proj4 definition</code></pre>
+<pre class="r"><code>LA = tibble(
+  long = c(-118.2437),
+  lat = c(34.0522),
+  names = c(&quot;Los Angeles&quot;))
+LA = usmap_transform(LA)</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj = prefer_proj): Discarded datum unknown in Proj4 definition</code></pre>
+<pre class="r"><code>Newark = tibble(
+  long = c(-74.1724),
+  lat = c(40.7357),
+  names = c(&quot;Newark&quot;))
+Newark = usmap_transform(Newark)</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj = prefer_proj): Discarded datum unknown in Proj4 definition</code></pre>
+<pre class="r"><code>Wburg = tibble(
+  long = c(-76.7075),
+  lat = c(37.2707),
+  names = c(&quot;Williamsburg&quot;))
+Wburg = usmap_transform(Wburg)</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj = prefer_proj): Discarded datum unknown in Proj4 definition</code></pre>
+<pre class="r"><code>Ffield = tibble(
+  long = c(-122.0405),
+  lat = c(38.2492),
+  names = c(&quot;Fairfield&quot;))
+Ffield = usmap_transform(Ffield)</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj = prefer_proj): Discarded datum unknown in Proj4 definition</code></pre>
+<pre class="r"><code>FCol = tibble(
+  long = c(-105.0844),
+  lat = c(40.5853),
+  names = c(&quot;Fort Collins&quot;))
+FCol = usmap_transform(FCol)</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj = prefer_proj): Discarded datum unknown in Proj4 definition</code></pre>
+<pre class="r"><code>Houston = tibble(
+  long = c(-95.3698),
+  lat = c(29.7604),
+  names = c(&quot;Houston&quot;))
+Houston = usmap_transform(Houston)</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj = prefer_proj): Discarded datum unknown in Proj4 definition</code></pre>
+<pre class="r"><code>Jville = tibble(
+  long = c(-81.6557),
+  lat = c(30.3322),
+  names = c(&quot;Jacksonville&quot;))
+Jville = usmap_transform(Jville)</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj = prefer_proj): Discarded datum unknown in Proj4 definition</code></pre>
+<pre class="r"><code>Mrry = tibble(
+  long = c(-71.4948),
+  lat = c(42.8679),
+  names = c(&quot;Jacksonville&quot;))
+Mrry = usmap_transform(Mrry)</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj = prefer_proj): Discarded datum unknown in Proj4 definition</code></pre>
+<pre class="r"><code>Stlouis = tibble(
+  long = c(-90.1994),
+  lat = c(38.6270),
+  names = c(&quot;Jacksonville&quot;))
+Stlouis = usmap_transform(Stlouis)</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj = prefer_proj): Discarded datum unknown in Proj4 definition</code></pre>
+<p><br></p>
+<p><br></p>
+</div>
+<div id="plot-data-in-us-heatmap" class="section level5">
+<h5>Plot Data in US Heatmap</h5>
+<pre class="r"><code>plot_usmap(data = beermap, values = &quot;Breweries&quot;, color = &quot;tan3&quot;) + 
+  scale_fill_continuous(
+    low = &quot;white&quot;, high = &quot;darkolivegreen4&quot;, name = &quot;Breweries&quot;, label = scales::comma) +
+  theme(legend.position = &quot;right&quot;) +
+  labs(title = &quot;IPA Brewers by State&quot;) + 
+  theme(panel.background = element_rect(color = &quot;gray&quot;, fill = &quot;lightsteelblue3&quot;)) +
+  theme(plot.title = element_text(size = 20, face = &quot;bold&quot;)) + 
+  geom_point(data = Cbus, aes(x = long.1, y = lat.1), shape = 21, color = &quot;black&quot;, fill = &quot;firebrick2&quot;, size = 3) +
+  geom_point(data = Bville, aes(x = long.1, y = lat.1), shape = 21, color = &quot;black&quot;, fill = &quot;firebrick2&quot;, size = 3) +
+  geom_point(data = Cville, aes(x = long.1, y = lat.1), shape = 21, color = &quot;black&quot;, fill = &quot;firebrick2&quot;, size = 3) +
+  geom_point(data = LA, aes(x = long.1, y = lat.1), shape = 21, color = &quot;black&quot;, fill = &quot;firebrick2&quot;, size = 3) +
+  geom_point(data = Newark, aes(x = long.1, y = lat.1), shape = 21, color = &quot;black&quot;, fill = &quot;firebrick2&quot;, size = 3) +
+  geom_point(data = Wburg, aes(x = long.1, y = lat.1), shape = 21, color = &quot;black&quot;, fill = &quot;firebrick2&quot;, size = 3) +
+  geom_point(data = Ffield, aes(x = long.1, y = lat.1), shape = 21, color = &quot;black&quot;, fill = &quot;firebrick2&quot;, size = 3) +
+  geom_point(data = FCol, aes(x = long.1, y = lat.1), shape = 21, color = &quot;black&quot;, fill = &quot;firebrick2&quot;, size = 3) +
+  geom_point(data = Houston, aes(x = long.1, y = lat.1), shape = 21, color = &quot;black&quot;, fill = &quot;firebrick2&quot;, size = 3) +
+  geom_point(data = Jville, aes(x = long.1, y = lat.1), shape = 21, color = &quot;black&quot;, fill = &quot;firebrick2&quot;, size = 3) +
+  geom_point(data = Mrry, aes(x = long.1, y = lat.1), shape = 21, color = &quot;black&quot;, fill = &quot;firebrick2&quot;, size = 3) +
+  geom_point(data = Stlouis, aes(x = long.1, y = lat.1), shape = 21, color = &quot;black&quot;, fill = &quot;firebrick2&quot;, size = 3)</code></pre>
+<p><img src="Beer_Project_EDA_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+<p><br></p>
+<p><br></p>
+</div>
+<div id="findings-4" class="section level5">
+<h5>Findings</h5>
+<ul>
+<li><p>Markets in California and Colorado locations appear oversaturated - it may not make sense to introduce a new Budweiser IPA into these brewing locations</p></li>
+<li><p>The Texas, Midwest, New England, and Virginia locations all have moderate counts of IPA breweries in the area. This may indicate interest in IPAs by the local populace, and it may be worth investigating further to see if it makes sense to introduce a Budweiser IPA.</p></li>
+<li><p>The Georgia and Florida Budweiser Breweries are in an area where wither there are almost <strong>no</strong> IPA breweries, or they are adjacent to this market. It would be worth investigating demand for IPAs in this area. If it exists, it would be strongly recommended to introduce a new Budweiser IPA into these locations to take advantage of this opportunity.</p></li>
+</ul>
+</div>
+</div>
+<div id="plot-south-southeast-only" class="section level4">
+<h4>Plot South / Southeast Only</h4>
+<pre class="r"><code>plot_usmap(include = .south_region, data = beermap, values = &quot;Breweries&quot;, color = &quot;tan3&quot;) + 
+  scale_fill_continuous(
+    low = &quot;white&quot;, high = &quot;darkolivegreen4&quot;, name = &quot;Breweries&quot;, label = scales::comma) +
+  theme(legend.position = &quot;right&quot;) +
+  labs(title = &quot;IPA Brewers: Southeastern States&quot;) + 
+  theme(panel.background = element_rect(color = &quot;gray&quot;, fill = &quot;lightsteelblue3&quot;)) +
+  theme(plot.title = element_text(size = 20, face = &quot;bold&quot;)) +
+  geom_point(data = Cville, aes(x = long.1, y = lat.1), shape = 21, color = &quot;black&quot;, fill = &quot;firebrick2&quot;, size = 3) +
+  geom_text(data = Cville, aes(x = long.1, y = lat.1, label = names), hjust = 0.5, vjust = 1.5, nudge_x = 4, color = &quot;black&quot;) +
+  geom_point(data = Wburg, aes(x = long.1, y = lat.1), shape = 21, color = &quot;black&quot;, fill = &quot;firebrick2&quot;, size = 3) +
+  geom_text(data = Wburg, aes(x = long.1, y = lat.1, label = names), hjust = 0.5, vjust = 1.5, nudge_x = 4, color = &quot;black&quot;) +
+  geom_point(data = Houston, aes(x = long.1, y = lat.1), shape = 21, color = &quot;black&quot;, fill = &quot;firebrick2&quot;, size = 3) +
+  geom_text(data = Houston, aes(x = long.1, y = lat.1, label = names), hjust = 0.5, vjust = 1.5, nudge_x = 4, color = &quot;black&quot;) +
+  geom_point(data = Jville, aes(x = long.1, y = lat.1), shape = 21, color = &quot;black&quot;, fill = &quot;firebrick2&quot;, size = 3) +
+  geom_text(data = Jville, aes(x = long.1, y = lat.1, label = names), hjust = 0.5, vjust = 1.5, nudge_x = 4, color = &quot;black&quot;) </code></pre>
+<p><img src="Beer_Project_EDA_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+<p><br></p>
+<p><br></p>
+<div id="findings-5" class="section level5">
+<h5>Findings</h5>
+<ul>
+<li>The introduction of an IPA in a brewery location like Cartersville, GA would be ideal. IPAs are wildly underrepresented in this market.</li>
+</ul>
+<p><br></p>
+<p><br></p>
+</div>
+<div id="investigate-beer-trends-in-the-southeast" class="section level5">
+<h5>Investigate Beer trends in the Southeast</h5>
+<pre class="r"><code># Filter by beers in the southeastern US - Note that IPA dataset is used, but that this is a full beer dataset modified to include a binary column for IPA designation
+
+SEBeerdf = IPA %&gt;%
+              filter(grepl(&quot;FL&quot;,State)|
+                       grepl(&quot;AL&quot;,State)|
+                       grepl(&quot;GA&quot;,State)|
+                       grepl(&quot;MS&quot;,State)|
+                       grepl(&quot;SC&quot;,State)|
+                       grepl(&quot;NC&quot;,State)|
+                       grepl(&quot;TN&quot;,State)|
+                       grepl(&quot;MD&quot;,State)|
+                       grepl(&quot;VA&quot;,State)|
+                       grepl(&quot;KY&quot;,State))
+
+head(SEBeerdf)</code></pre>
+<pre><code>##   Brew_ID                   Brewery       City State            Beer Beer_ID   ABV IBU                          Style Ounces IPA_Count
+## 1       2 Against the Grain Brewery Louisville    KY  Citra Ass Down    2686 0.080  68 American Double / Imperial IPA     16         1
+## 2       2 Against the Grain Brewery Louisville    KY  London Balling    2685 0.125  80             English Barleywine     16         0
+## 3       2 Against the Grain Brewery Louisville    KY            35 K    2684 0.077  25             Milk / Sweet Stout     16         0
+## 4       2 Against the Grain Brewery Louisville    KY          A Beer    2683 0.042  42        American Pale Ale (APA)     16         0
+## 5       2 Against the Grain Brewery Louisville    KY Rules are Rules    2682 0.050  25                German Pilsener     16         0
+## 6       2 Against the Grain Brewery Louisville    KY   Flesh Gourd&#39;n    2681 0.066  21                    Pumpkin Ale     16         0</code></pre>
+<pre class="r"><code>#Facet Wrap by State for a comparison of ABV vs IBU in this region
+SEBeerdf %&gt;%
+      ggplot(aes(x = IBU, y = ABV, color = State)) + 
+  geom_point() + 
+  labs(title = &quot;Bitterness vs. Alcohol Content&quot;, 
+       x = &quot;Bitterness&quot;, 
+       y = &quot;Alcohol Content&quot;) + 
+  facet_wrap(~State)</code></pre>
+<pre><code>## Warning: Removed 93 rows containing missing values (geom_point).</code></pre>
+<p><img src="Beer_Project_EDA_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+<pre class="r"><code>#Histogram shows us that the most popular ale styles are IPA and APA
+
+SEBeerdf %&gt;%
+  ggplot(aes(x = Style)) + geom_histogram(stat=&quot;count&quot;) + labs(title = &quot;SE Region Count by Style&quot;, x = &quot;Style&quot;, y = &quot;Count&quot;) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))</code></pre>
+<pre><code>## Warning: Ignoring unknown parameters: binwidth, bins, pad</code></pre>
+<p><img src="Beer_Project_EDA_files/figure-html/unnamed-chunk-27-2.png" width="672" /></p>
+<pre class="r"><code>#Filter for American IPA
+
+TestBeer &lt;- c(&quot;American IPA&quot;)
+SEMarket &lt;- SEBeerdf %&gt;%
+              filter(Style == TestBeer)
+
+
+
+#We observed an outlier with high IBU and low ABV. Further investigation revealed that this IBU count may have been an error, since the brewery&#39;s website lists it as significantly lower. We removed this data point.
+
+SEMarket = SEMarket %&gt;%
+                filter(!grepl(&quot;Troopers Alley IPA&quot;,Beer))
+
+head(SEMarket)</code></pre>
+<pre><code>##   Brew_ID                    Brewery          City State           Beer Beer_ID   ABV IBU        Style Ounces IPA_Count
+## 1       2  Against the Grain Brewery    Louisville    KY   Pile of Face    2675 0.060  65 American IPA     16         1
+## 2       6      COAST Brewing Company    Charleston    SC         HopArt    2653 0.077  NA American IPA     16         1
+## 3      50 SweetWater Brewing Company       Atlanta    GA SweetWater IPA    1710 0.064  NA American IPA     12         1
+## 4      51       Flying Mouse Brewery    Troutville    VA Flying Mouse 4    2566 0.070  70 American IPA     12         1
+## 5      63  Against The Grain Brewery    Louisville    KY Citra Ass Down    2540 0.082  68 American IPA     16         1
+## 6      68        3 Daughters Brewing St Petersburg    FL   Bimini Twist    2519 0.070  82 American IPA     12         1</code></pre>
+<pre class="r"><code>#Dot Plot of ABV vs IBU
+
+p = SEMarket %&gt;%
+    ggplot(aes(x = IBU, y = ABV)) +
+  geom_point(size = 3, 
+             fill = &quot;dodgerblue4&quot;, 
+             color = &quot;dodgerblue4&quot;) + 
+  labs(title = &quot;IPA Bitterness vs. Alcohol Content in the South East Region (US)&quot;, 
+       x = &quot;Bitterness&quot;, 
+       y = &quot;Alcohol Content&quot;) +
+    geom_smooth(method = lm, 
+                color = &quot;darkgoldenrod1&quot;) +
+    theme(panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank())
+  
+ggbackground(p, img)</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<pre><code>## Warning: Removed 12 rows containing non-finite values (stat_smooth).</code></pre>
+<pre><code>## Warning: Removed 12 rows containing missing values (geom_point).</code></pre>
+<p><img src="Beer_Project_EDA_files/figure-html/unnamed-chunk-27-3.png" width="672" /></p>
+<pre class="r"><code>#Facet Wrap by State Dot Plot of ABV vs IBU
+SEMarket %&gt;%
+  ggplot(aes(x = IBU, y = ABV)) + 
+  geom_point(fill = &quot;dodgerblue4&quot;, 
+             color = &quot;dodgerblue4&quot;) + 
+  labs(title = &quot;IPA Bitterness vs. Alcohol Content in the South East Region (US)&quot;, 
+       x = &quot;Bitterness&quot;, 
+       y = &quot;Alcohol Content&quot;) + 
+  facet_wrap(~State)</code></pre>
+<pre><code>## Warning: Removed 12 rows containing missing values (geom_point).</code></pre>
+<p><img src="Beer_Project_EDA_files/figure-html/unnamed-chunk-27-4.png" width="672" /></p>
+<pre class="r"><code>#Median IBU for the SE Region
+SEMarket %&gt;%
+  filter(!is.na(IBU)) %&gt;%
+  summarise_at(vars(IBU), list(Median_IBU = median))</code></pre>
+<pre><code>##   Median_IBU
+## 1         65</code></pre>
+<pre class="r"><code>#Median IBU for the SE Region by State
+SEMarket %&gt;%
+  filter(!is.na(IBU)) %&gt;%
+  group_by(State) %&gt;%
+  summarise_at(vars(IBU), list(Median_IBU = median))</code></pre>
+<pre><code>## # A tibble: 10 x 2
+##    State Median_IBU
+##    &lt;chr&gt;      &lt;dbl&gt;
+##  1 AL          67  
+##  2 FL          62  
+##  3 GA          60  
+##  4 KY          66.5
+##  5 MD          45  
+##  6 MS          68.5
+##  7 NC          73  
+##  8 SC          65  
+##  9 TN          58  
+## 10 VA          65</code></pre>
+<pre class="r"><code>#Median ABV for the SE Region
+SEMarket %&gt;%
+  filter(!is.na(ABV)) %&gt;%
+  summarise_at(vars(ABV), list(Median_ABV = median))</code></pre>
+<pre><code>##   Median_ABV
+## 1       0.07</code></pre>
+<pre class="r"><code>#Median ABV for the SE Region by State
+SEMarket %&gt;%
+  filter(!is.na(ABV)) %&gt;%
+  group_by(State) %&gt;%
+  summarise_at(vars(ABV), list(Median_ABV = median))</code></pre>
+<pre><code>## # A tibble: 10 x 2
+##    State Median_ABV
+##    &lt;chr&gt;      &lt;dbl&gt;
+##  1 AL        0.066 
+##  2 FL        0.07  
+##  3 GA        0.064 
+##  4 KY        0.065 
+##  5 MD        0.07  
+##  6 MS        0.076 
+##  7 NC        0.067 
+##  8 SC        0.0725
+##  9 TN        0.061 
+## 10 VA        0.07</code></pre>
+</div>
+<div id="conclusion" class="section level5">
+<h5>Conclusion</h5>
+<p>Given the datasets Beers.csv and Breweries.csv we were tasked to analyze several aspects of the data.</p>
+<p>Our first task was to determine a brewery count by State. We have demonstrated this with a summary of the data as a histogram for a visual reference. We found that there were large numbers of breweries in the western region of the United States and that the top ten states with the highest brewery counts accounted for over 50% of total breweries.</p>
+<p>A deeper analysis required that the two datasets provided be merged. The Brewery_ID column from the beers.csv dataset provided the best option to complete this.</p>
+<p>After merging the datasets, missing or NA values were removed to effectively study any relationships between the data points. We noted that in doing so, the highest ABV value was removed from our analysis.</p>
+<p>Working with the merged and complete values dataset, we computed the median ABV and IBU for each state and presented the results in a bar graph.</p>
+<p>It was found that Oregon’s Astoria Brewing Company out of Astoria has the Bitter Bitch Imperial IPA with 138 IBUs and that Kentucky’s Against the Grain Brewery out of Louisville has the London Balling English Barleywine with an ABV of 12.5%.</p>
+<p>We then showed summary statistics of the ABV values. There was a slight right skew to the values but Budweiser’s ABV proved close to the median.</p>
+<p>Showing a scatterplot of ABV vs IBU provided strong evidence of a linear relationship. We fit a linear regression line to emphasize our findings.</p>
+<p>Basing further discovery on the linear relationship, an optimized KNN model was created to classify IPAs vs other Ales in the dataset. The model favored IPAs as the higher ABV and IBU beer. This relationship is crucial when considering the explosive popularity of IPAs in recent years.</p>
+<p>Outside exploration demonstrated massive potential for an IPA market in the southeast region of the United States. Consumption of alcoholic beverages is relatively high in Georgia and a regional exploration of breweries proved little IPA options, especially when disregarding Florida. With these considerations, it is highly recommended that Budweiser utilize existing resources in the region to test an IPA; an extremely desirable beer in a region that is relatively untapped.</p>
+</div>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

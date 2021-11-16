@@ -1,0 +1,8 @@
+name: "My-Website"
+navbar:
+  title: "Wicked Awesome Website"
+  left:  
+    - text: "Home"
+      href: index.html
+    - text: "Beer Study - Budweiser"
+      href: Beer_Project_EDA.html
